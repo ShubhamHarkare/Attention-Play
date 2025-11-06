@@ -30,24 +30,31 @@ class Trainer:
 
 
         self.optimizer = torch.optim.AdamW(
-            model.parameters(), 
+            model.parameters(),
             lr=config.LEARNING_RATE,
-            weight_decay=0.01
+            weight_decay=0.01,
+            betas=(0.9, 0.999)
         )
-        self.criterion = nn.CrossEntropyLoss(ignore_index=0)
+
+        # Loss with label smoothing for better generalization
+        label_smoothing = getattr(config, 'LABEL_SMOOTHING', 0.0)
+        self.criterion = nn.CrossEntropyLoss(ignore_index=0, label_smoothing=label_smoothing)
+
         self.train_losses = []
         self.val_losses = []
         self.val_accuracies = []
         self.best_val_loss = float('inf')
+        self.best_val_acc = 0.0
         self.patience_counter = 0
-        self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        self.optimizer,
-        mode='min',
-        factor=0.5,
-        patience=3,
-        # verbose=True,
-        min_lr=1e-6
+
+        # Cosine annealing with warmup for better training
+        self.warmup_epochs = getattr(config, 'WARMUP_EPOCHS', 0)
+        self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            self.optimizer,
+            T_max=config.NUM_EPOCHS - self.warmup_epochs,
+            eta_min=1e-6
         )
+        self.current_epoch = 0
 
 
     def train_epoch(self):
@@ -109,13 +116,29 @@ class Trainer:
         return avg_loss, accuracies
     
 
+    def _warmup_lr(self, epoch):
+        """Learning rate warmup"""
+        if epoch < self.warmup_epochs:
+            lr_scale = (epoch + 1) / self.warmup_epochs
+            for param_group in self.optimizer.param_groups:
+                param_group['lr'] = self.config.LEARNING_RATE * lr_scale
+
     def train(self):
-        """Full training loop"""
+        """Full training loop with enhanced features"""
         print(f"\n{'='*80}")
         print(f"Training {self.model_name}")
         print(f"{'='*80}\n")
-        
+
         for epoch in range(self.config.NUM_EPOCHS):
+            self.current_epoch = epoch
+
+            # Apply learning rate warmup
+            if epoch < self.warmup_epochs:
+                self._warmup_lr(epoch)
+                print(f"Warmup Epoch {epoch + 1}/{self.warmup_epochs} - LR: {self.optimizer.param_groups[0]['lr']:.6f}")
+
+            # Diagnostic after first epoch
+
             if epoch == 0:  # After first epoch
                 print("\n" + "=" * 80)
                 print("POST-EPOCH-1 DIAGNOSTICS")
@@ -177,26 +200,35 @@ class Trainer:
             
             print(f"Train Loss: {train_loss:.4f}")
             print(f"Val Loss: {val_loss:.4f}")
+            print(f"Val Top-1 Acc: {val_accs[1]:.2f}%")
+            print(f"Val Top-5 Acc: {val_accs[5]:.2f}%")
             print(f"Val Top-10 Acc: {val_accs[10]:.2f}%")
-            
-            # Save best model
-            if val_loss < self.best_val_loss:
+            print(f"Val Top-20 Acc: {val_accs[20]:.2f}%")
+            print(f"Current LR: {self.optimizer.param_groups[0]['lr']:.6f}")
+
+            # Track best model by validation accuracy (Top-10)
+            current_val_acc = val_accs[10]
+            if current_val_acc > self.best_val_acc:
+                self.best_val_acc = current_val_acc
                 self.best_val_loss = val_loss
                 self.patience_counter = 0
                 self.save_checkpoint('best')
-                print("✓ Best model saved!")
+                print("✓ Best model saved! (by Top-10 accuracy)")
             else:
                 self.patience_counter += 1
-            
+
             # Early stopping
             if self.patience_counter >= self.config.PATIENCE:
                 print(f"\nEarly stopping triggered after {epoch + 1} epochs")
                 break
-            
+
             # Save periodic checkpoint
             if (epoch + 1) % 5 == 0:
                 self.save_checkpoint(f'epoch_{epoch + 1}')
-            self.scheduler.step(val_loss)
+
+            # Learning rate scheduling (after warmup)
+            if epoch >= self.warmup_epochs:
+                self.scheduler.step()
         
         return self.val_accuracies[-1]
     

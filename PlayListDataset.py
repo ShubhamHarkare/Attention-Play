@@ -15,16 +15,17 @@ class PlaylistDataset(Dataset):
         self.max_sequence_length = max_sequence_length
 
 
-        self.track_to_idx = {track:idx for idx,track in enumerate(self.vocab)}
-        self.idx_to_track = {idx:track for idx,track in self.track_to_idx.items()}
-
-
+        # Reserve indices for special tokens
         self.PAD_IDX = 0
-        self.UNK_IDX = len(self.vocab) - 1
+        self.UNK_IDX = 1
+
+        # Build vocabulary with offset to avoid overlap
+        self.track_to_idx = {track: idx + 2 for idx, track in enumerate(self.vocab)}
+        self.idx_to_track = {idx: track for track, idx in self.track_to_idx.items()}
 
 
     def __len__(self):
-        return len(self.vocab)
+        return len(self.df)
     
     def __getitem__(self, idx):
         row =  self.df.iloc[idx]
