@@ -128,16 +128,16 @@ def main():
 
     print("=" * 80 + "\n")
     # Train GRU4Rec
-    print("\n[3/5] Training GRU4Rec...")
-    gru_model = GRU4Rec(
-        num_items=num_items,
-        embedding_dim=config.EMBEDDING_DIM,
-        hidden_dim=config.HIDDEN_DIM,
-        dropout=config.DROPOUT
-    )
+    # print("\n[3/5] Training GRU4Rec...")
+    # gru_model = GRU4Rec(
+    #     num_items=num_items,
+    #     embedding_dim=config.EMBEDDING_DIM,
+    #     hidden_dim=config.HIDDEN_DIM,
+    #     dropout=config.DROPOUT
+    # )
     
-    gru_trainer = Trainer(gru_model, train_loader, val_loader, config, "GRU4Rec")
-    gru_results = gru_trainer.train()
+    # gru_trainer = Trainer(gru_model, train_loader, val_loader, config, "GRU4Rec")
+    # gru_results = gru_trainer.train()
     
     # Train Transformer
     print("\n[4/5] Training Transformer...")

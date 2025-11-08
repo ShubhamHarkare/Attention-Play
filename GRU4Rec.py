@@ -32,18 +32,18 @@ class GRU4Rec(nn.Module):
         self.fc2 = nn.Linear(hidden_dim // 2, num_items)
         
         # Initialize weights
-        self._init_weights()
+        # self._init_weights()
     
-    def _init_weights(self):
-        # Better initialization
-        for name, param in self.named_parameters():
-            if 'weight' in name:
-                if 'gru' in name:
-                    nn.init.orthogonal_(param)
-                else:
-                    nn.init.xavier_uniform_(param)
-            elif 'bias' in name:
-                nn.init.zeros_(param)
+    # def _init_weights(self):
+    #     # Better initialization
+    #     for name, param in self.named_parameters():
+    #         if 'weight' in name:
+    #             if 'gru' in name:
+    #                 nn.init.orthogonal_(param)
+    #             else:
+    #                 nn.init.xavier_uniform_(param)
+    #         elif 'bias' in name:
+    #             nn.init.zeros_(param)
     
     def forward(self, x, mask=None):
         # Embedding
