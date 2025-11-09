@@ -37,7 +37,7 @@ class GRU4Rec(nn.Module):
     def _init_weights(self):
         """Better initialization with proper dimension checks"""
         for name, param in self.named_parameters():
-            if 'weight' in name:
+            if param.dim() >= 2:  # Only initialize 2D+ tensors
                 if 'gru' in name:
                     nn.init.orthogonal_(param)
                 elif param.dim() >= 2:  # Xavier only works for 2D+ tensors
