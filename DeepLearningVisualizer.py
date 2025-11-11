@@ -3,9 +3,14 @@ from PlaylistTransformer import PlaylistTransformer
 import torch
 import seaborn as sns
 import numpy as np
-# print("PyTorch version:", torch.__version__)
-device = torch.device('mps' if torch.mps.is_available() else 'cpu')
-# print(f"Using device: {device}")
+
+# Device detection with proper error handling
+if torch.cuda.is_available():
+    device = torch.device('cuda')
+elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+    device = torch.device('mps')
+else:
+    device = torch.device('cpu')
 class DeepLearningVisualizer:
     """Visualizations for deep learning results"""
     
