@@ -33,3 +33,5 @@ archive-2/
 
 # Reports
 reports.md
+
+.gradio/
