@@ -1,6 +1,6 @@
 # Output directory
 output/
-
+models_greatlakes/
 # Python
 __pycache__/
 *.py[cod]
