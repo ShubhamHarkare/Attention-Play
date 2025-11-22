@@ -1,0 +1,9 @@
+archive-2/
+output/data/
+output/models/
+output/models_greatlakes/
+venv/
+slurm-36373693.output
+submit.sh
+__pycahche__/
+.DS_Store

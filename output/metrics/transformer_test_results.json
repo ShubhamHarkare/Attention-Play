@@ -1,0 +1,13 @@
+{
+  "checkpoint_used": "output/models_greatlakes/Transformer_best.pt",
+  "test_samples": 732616,
+  "accuracies": {
+    "1": 10.948300337420969,
+    "5": 25.23559409021916,
+    "10": 34.300916168907044,
+    "20": 45.54555183069985
+  },
+  "mrr": 0.1881106464035743,
+  "median_rank": 26.0,
+  "mean_confidence": 0.04615381360054016
+}
