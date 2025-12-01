@@ -1,80 +1,195 @@
-# AttentionPlay — Playlist Recommendation ML Pipeline
+# AttentionPlay — Deep Learning Playlist Recommendation System
 
-AttentionPlay is a research-oriented ML pipeline for playlist continuation and item recommendation. It includes data loading & preprocessing, baseline models based on audio features and transition matrices, and deep learning models (GRU4Rec and Transformer) with evaluation and visualization tools.
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
 
-## Contents (key files)
-- Project entry points:
-  - [main.py](main.py) — end-to-end pipeline: preprocessing, baselines, Transformer data prep, evaluation, and visualizations.
-  - [main_2.py](main_2.py) — focused deep-learning training pipeline (GRU4Rec & Transformer).
-- Configuration:
-  - [`Config`](config.py) — central configuration for the baseline pipeline ([config.py](config.py)).
-  - [`TrainingConfig`](TraningConfig.py) — training-specific defaults for deep models ([TraningConfig.py](TraningConfig.py)).
-- Data & loaders:
-  - [`SpotifyDataLoader`](dataloader.py) — load and preprocess MPD JSONs and audio features ([dataloader.py](dataloader.py)).
-  - [PlayListDataset.py](PlayListDataset.py) — dataset class used by the PyTorch data loaders.
-  - [TransformerDataPreparation.py](TransformerDataPreparation.py) — sequence generation for Transformer training.
-- Feature engineering & baselines:
-  - [`FeatureEngineer.create_audio_embeddings`](FeatureEngineer.py) — create normalized audio embeddings from audio CSVs ([FeatureEngineer.py](FeatureEngineer.py)).
-  - [BaselineModels.py](BaselineModels.py) — KNN / similarity-based baselines and helpers.
-  - [check_vocab.py](check_vocab.py) — dataset vocabulary diagnostics.
-- Models & training:
-  - [`GRU4Rec`](GRU4Rec.py) — GRU-based sequential recommender ([GRU4Rec.py](GRU4Rec.py)).
-  - [`PlaylistTransformer`](PlaylistTransformer.py) — Transformer model architecture ([PlaylistTransformer.py](PlaylistTransformer.py)).
-  - [`Trainer`](Trainer.py) — training loop used for deep models ([Trainer.py](Trainer.py)).
-- Evaluation & visualization:
-  - [`Evaluator`](Evaluator.py) — baseline & deep model evaluation utilities ([Evaluator.py](Evaluator.py)).
-  - [Visualizer.py](Visualizer.py) — baseline visualization helpers.
-  - [`DeepLearningVisualizer.plot_training_curves`](DeepLearningVisualizer.py) — plots training/validation curves and attention visualization ([DeepLearningVisualizer.py](DeepLearningVisualizer.py)).
-  - [DeepLearningVisualizer.py](DeepLearningVisualizer.py)
-- Utilities & extras:
-  - [FeatureEngineer.py](FeatureEngineer.py), [diagnostic.py](diagnostic.py), [report.md](report.md)
-- Outputs:
-  - `output/` — saved data, metrics, models, and visualizations
-  - `output/models/`, `output/data/`, `output/metrics/`, `output/visualizations/`
+A research-oriented deep learning pipeline for playlist continuation and music recommendation using the Spotify Million Playlist Dataset. This project implements and compares multiple architectures from traditional baselines to state-of-the-art Transformer models.
 
-## Quickstart
+## 📊 Project Overview
+AttentionPlay tackles the sequential playlist continuation problem: given a user's listening history, predict the next track they'll enjoy. This is a challenging task with applications in music streaming platforms like Spotify, Apple Music, and YouTube Music. AttentionPlay considers the tracks in a playlist as sequences which helps in implementation of the transformer architecture
 
-1. Create and activate a Python 3.8+ environment and install dependencies (example):
-```bash
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+### *Key Features*
+- **Multiple Model Architecture:** `KNearestNeighbors`,`CosineSimilarity`,`Gated-Recurrent Networks (GRU)` & `Transformer Architecture`
+- **Large-Scale Dataset:** Used the [Spotify Million Playlist Dataset](https://www.kaggle.com/datasets/himanshuwagh/spotify-million) and [spotify-tracks-dataset](https://huggingface.co/datasets/maharshipandya/spotify-tracks-dataset)
+- **Context-Aware Recommendation:** Fine-Tuned the model based on the mood of the playlist.
+
+## 🎯 Results
+<table>
+<tr>
+  <th>Model</th>
+  <th>Top-1</th>
+  <th>Top-5</th>
+  <th>Top-10</th>
+  <th>Top-20</th>
+</tr>
+<tr>
+  <td>KNearestNeighbor</td>
+  <td>0.18%</td>
+  <td>0.96%</td>
+  <td>1.85%</td>
+  <td>3.49%</td>
+</tr>
+<tr>
+  <td>CosineSimilarity</td>
+  <td>0.17%</td>
+  <td>0.95%</td>
+  <td>1.87%</td>
+  <td>3.35%</td>
+</tr>
+<tr>
+  <td>GRU</td>
+  <td>9.73%</td>
+  <td>23.61%</td>
+  <td>33.09%</td>
+  <td>44.73%</td>
+</tr>
+<tr>
+  <td><b>Transformer</b></td>
+  <td><b>10.95%</b></td>
+  <td><b>25.24%</b></td>
+  <td><b>34.40%</b></td>
+  <td><b>45.55%</b></td>
+</tr>
+</table>
+
+### 🗝️ *Key-Findings*
+1. Transformer achieves best performance across all Top-K metrics
+2. ~18x improvement over baseline (Top-10: 34.3% vs 1.85%)
+3. Attention mechanisms are critical for capturing playlist context
+4. Deep models significantly outperform traditional ML baselines
+
+[![Baseline Model](output/visualizations/baseline_comparison.png)]()
+[![GRU and Transformer](output/visualizations/learning_curves_detailed.png)]()
+
+
+## 🏋️‍♂️ Training Details
+*Dataset Statistics:*
+<table>
+<tr>
+  <th>Metric</th>
+  <th>Value</th>
+</tr>
+
+<tr>
+  <th>Total Playlists</th>
+  <td>41,243 tracks</td>
+</tr>
+<tr>
+  <th>Unique Playlists</th>
+  <td>5,899 tracks</td>
+</tr>
+<tr>
+  <th>Training Sequences</th>
+  <td>3,414,231</td>
+</tr>
+
+<tr>
+  <th>Validation Sequences</th>
+  <td>729,960</td>
+</tr>
+<tr>
+  <th>Test Sequences</th>
+  <td>729,960</td>
+</tr>
+<tr>
+  <th>Average Playlist Length</th>
+  <td>12.6 songs</td>
+</tr>
+<tr>
+  <th>Median Sequences</th>
+  <td>7 songs</td>
+</tr>
+
+</table>
+
+## 🤖 Model Architecture
+1. *Transformer Configuarion*
+  - Embedding Dimension: 256
+  - Hidden Dimension: 512
+  - Attention Heads: 8
+  - Encoder Layers: 4
+  - Dropout: 0.3
+  - Model Parameters: 7,044,365
+2. *Training HyperParameters*
+  - Optimizer: AdamW (lr=0.0005, weight_decay=0.01)
+  - Scheduler: Cosine Annealing with 3-epoch warmup
+  - Loss Function: Cross-Entropy with 0.1 label smoothing
+  - Batch Size: 128
+  - Max Sequence Length: 50
+
+
+## 📶 Visualizations
+
+[![Visuals](output/visualizations/audio_features.png)]()
+
+[![Visuals](output/visualizations/data_distribution.png)]()
+[![Visuals](output/visualizations/dataset_statistics.png)]()
+[![Visuals](output/visualizations/feature_importance.png)]()
+[![Visuals](output/visualizations/training_efficiency.png)]()
+[![Visuals](output/visualizations/transformer_test_results.png)]()
+
+
+## 📘 Usage Examples
+
+**Training Model**
 ```
-(If `requirements.txt` is not present, install typical packages: numpy, pandas, torch, scikit-learn, matplotlib, seaborn, tqdm, pyarrow.)
+from TraningConfig import TrainingConfig
+from PlaylistTransformer import PlaylistTransformer
+from Trainer import Trainer
 
-2. Configure paths and parameters in [`config.py`](config.py) or [`TraningConfig.py`](TraningConfig.py). Important settings:
-   - `MPD_DIR` and `AUDIO_FEATURES_PATH` in [`Config`](config.py)
-   - `OUTPUT_DIR`, `NUM_FILES_TO_PROCESS`, `MIN_PLAYLIST_LENGTH` in [`Config`](config.py)
-   - training hyperparameters in [`TraningConfig.py`](TraningConfig.py)
+# Initialize config
+config = TrainingConfig()
 
-3. Run the baseline + Transformer data prep pipeline:
-```bash
-python main.py
+# Create model
+model = PlaylistTransformer(
+    num_items=50000 + 2,  # vocab + PAD + UNK
+    d_model=256,
+    nhead=8,
+    num_layer=4,
+    dropout=0.3
+)
+
+# Train
+trainer = Trainer(model, train_loader, val_loader, config, "Transformer")
+results = trainer.train()
 ```
 
-4. Run the deep learning training pipeline (GRU4Rec + Transformer):
-```bash
-python main_2.py
+**Generating Recommendation**
+```
+from BaselineModels import BaselineModels
+
+# Load trained KNN model
+baselines = BaselineModels(config)
+baselines.train_knn(embeddings)
+
+# Get recommendations
+seed_song = "spotify:track:6rqhFgbbKwnb9MLmUQDhG6"  # Shape of You
+recommendations = baselines.get_knn_recommendations(seed_song, k=10)
+
+# Display results
+for track_uri, similarity in recommendations:
+    print(f"{track_uri}: {similarity:.3f}")
 ```
 
-## Typical workflow
-1. Use [`SpotifyDataLoader`](dataloader.py) to load raw MPD JSONs and audio feature CSVs.
-2. Create audio embeddings with [`FeatureEngineer.create_audio_embeddings`](FeatureEngineer.py) and build transition matrices.
-3. Train baseline models in [BaselineModels.py](BaselineModels.py) and evaluate with [`Evaluator`](Evaluator.py).
-4. Prepare sequence data with [TransformerDataPreparation.py](TransformerDataPreparation.py).
-5. Train deep models using [`Trainer`](Trainer.py) with [`GRU4Rec`](GRU4Rec.py) and [`PlaylistTransformer`](PlaylistTransformer.py).
-6. Visualize results with [Visualizer.py](Visualizer.py) and [`DeepLearningVisualizer`](DeepLearningVisualizer.py).
+**Context-Aware Recommendation**
+```
+from ContextAwareTransformer import ContextAwareTransformer
 
-## Outputs
-- Preprocessed Arrow files: `output/data/*.parquet`
-- Saved baseline models: `output/models/baselines.pkl`
-- Deep model checkpoints: `output/models/*_best.pt`
-- Metrics and summaries: `output/metrics/summary.json`, `output/metrics/deep_learning_results.json`
-- Visualizations: `output/visualizations/*.png`
+# Create context-aware model
+model = ContextAwareTransformer(
+    num_items=50000 + 2,
+    num_contexts=8,  # workout, study, party, chill, sleep, sad, happy, other
+    d_model=256
+)
 
-## Notes & tips
-- Inspect `report.md` for a line-by-line project walkthrough and configuration guidance ([report.md](report.md)).
-- Use [check_vocab.py](check_vocab.py) and diagnostic prints in [main_2.py](main_2.py) to verify vocabulary and UNK rates before training.
-- GPU vs Apple MPS: DeepLearningVisualizer checks `torch.mps` availability; configure device behavior in model training if needed ([DeepLearningVisualizer.py](DeepLearningVisualizer.py)).
-
-
+# Generate playlist with context
+seed_songs = [song1, song2, song3]
+context = 0  # workout
+playlist = model.generate_playlist(
+    seed_songs, 
+    context_idx=context,
+    max_length=15,
+    temperature=1.0,
+    top_k=50
+)
+```
