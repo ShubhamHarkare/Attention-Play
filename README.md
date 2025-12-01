@@ -1,19 +1,52 @@
-# AttentionPlay — Deep Learning Playlist Recommendation System
+# AttentionPlay — Transformer-Based Deep Learning Playlist Recommendation System
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
+![Status](https://img.shields.io/badge/Status-Research--Project-green)
 
-A research-oriented deep learning pipeline for playlist continuation and music recommendation using the Spotify Million Playlist Dataset. This project implements and compares multiple architectures from traditional baselines to state-of-the-art Transformer models.
+A research-grade deep learning pipeline for playlist continuation and personalized music recommendation.  
+AttentionPlay uses **sequential modeling**, **Transformer architectures**, and **context-aware embeddings** to predict the next track a user will enjoy — trained on the large-scale Spotify Million Playlist Dataset.
 
-## 📊 Project Overview
-AttentionPlay tackles the sequential playlist continuation problem: given a user's listening history, predict the next track they'll enjoy. This is a challenging task with applications in music streaming platforms like Spotify, Apple Music, and YouTube Music. AttentionPlay considers the tracks in a playlist as sequences which helps in implementation of the transformer architecture
+---
 
-### *Key Features*
-- **Multiple Model Architecture:** `KNearestNeighbors`,`CosineSimilarity`,`Gated-Recurrent Networks (GRU)` & `Transformer Architecture`
-- **Large-Scale Dataset:** Used the [Spotify Million Playlist Dataset](https://www.kaggle.com/datasets/himanshuwagh/spotify-million) and [spotify-tracks-dataset](https://huggingface.co/datasets/maharshipandya/spotify-tracks-dataset)
-- **Context-Aware Recommendation:** Fine-Tuned the model based on the mood of the playlist.
+# 📊 Project Overview
 
-## 🎯 Results
+**Goal:** Given a playlist (sequence of tracks), predict the next most likely track.
+
+This is the same problem tackled by Spotify, Apple Music, and YouTube Music for *playlist continuation*, *radio generation*, and *session-based music recommendation*.
+
+AttentionPlay models playlists as **sequence data**, enabling modern deep learning architectures (GRUs, Transformers) to understand long-range track relationships and playlist intent.
+
+---
+
+# ⭐ Key Features
+
+### 🔥 **Multiple Model Architectures**
+- **KNearestNeighbors**
+- **Cosine Similarity**
+- **GRU4Rec (Gated Recurrent Unit)**
+- **Custom Transformer Architecture**
+- **Context-Aware Recommendation Model**
+
+### 📦 **Large-Scale Industrial Dataset**
+- [Spotify Million Playlist Dataset](https://www.kaggle.com/datasets/himanshuwagh/spotify-million)  
+- [Spotify Tracks Dataset](https://huggingface.co/datasets/maharshipandya/spotify-tracks-dataset)
+
+### 🎚️ **Context-Aware Modeling**
+Fine-tunes predictions using the *mood / intent* of the playlist  
+(e.g., **workout**, **chill**, **party**, **study**, **sad**, **sleep**, etc.)
+
+---
+
+# 🧠 High-Level System Architecture
+
+![Baseline Model](output/visualizations/high-level-architecture.png)  
+---
+
+# 🎯 Results
+
+The Transformer achieves *state-of-the-art performance* across all Top-K metrics.
+
 <table>
 <tr>
   <th>Model</th>
@@ -52,144 +85,114 @@ AttentionPlay tackles the sequential playlist continuation problem: given a user
 </tr>
 </table>
 
-### 🗝️ *Key-Findings*
-1. Transformer achieves best performance across all Top-K metrics
-2. ~18x improvement over baseline (Top-10: 34.3% vs 1.85%)
-3. Attention mechanisms are critical for capturing playlist context
-4. Deep models significantly outperform traditional ML baselines
+### 🗝️ Key Findings
+1. Transformer significantly outperforms GRU and classic baselines  
+2. ~18× improvement over KNN baseline (Top-10)  
+3. Attention layers effectively model playlist context  
+4. Deep sequential models dominate simple similarity-based methods  
 
-[![Baseline Model](output/visualizations/baseline_comparison.png)]()
-[![GRU and Transformer](output/visualizations/learning_curves_detailed.png)]()
+#### Visualizations  
+![Baseline Model](output/visualizations/baseline_comparison.png)  
+![GRU and Transformer](output/visualizations/learning_curves_detailed.png)
 
+---
 
-## 🏋️‍♂️ Training Details
-*Dataset Statistics:*
+# 🏋️ Dataset & Training Details
+
+### 📚 Dataset Statistics
 <table>
-<tr>
-  <th>Metric</th>
-  <th>Value</th>
-</tr>
-
-<tr>
-  <th>Total Playlists</th>
-  <td>41,243 tracks</td>
-</tr>
-<tr>
-  <th>Unique Playlists</th>
-  <td>5,899 tracks</td>
-</tr>
-<tr>
-  <th>Training Sequences</th>
-  <td>3,414,231</td>
-</tr>
-
-<tr>
-  <th>Validation Sequences</th>
-  <td>729,960</td>
-</tr>
-<tr>
-  <th>Test Sequences</th>
-  <td>729,960</td>
-</tr>
-<tr>
-  <th>Average Playlist Length</th>
-  <td>12.6 songs</td>
-</tr>
-<tr>
-  <th>Median Sequences</th>
-  <td>7 songs</td>
-</tr>
-
+<tr><th>Metric</th><th>Value</th></tr>
+<tr><td>Total Tracks</td><td>41,243</td></tr>
+<tr><td>Unique Playlists</td><td>5,899</td></tr>
+<tr><td>Training Sequences</td><td>3,414,231</td></tr>
+<tr><td>Validation Sequences</td><td>729,960</td></tr>
+<tr><td>Test Sequences</td><td>729,960</td></tr>
+<tr><td>Avg Playlist Length</td><td>12.6 songs</td></tr>
+<tr><td>Median Length</td><td>7 songs</td></tr>
 </table>
 
-## 🤖 Model Architecture
-1. *Transformer Configuarion*
-  - Embedding Dimension: 256
-  - Hidden Dimension: 512
-  - Attention Heads: 8
-  - Encoder Layers: 4
-  - Dropout: 0.3
-  - Model Parameters: 7,044,365
-2. *Training HyperParameters*
-  - Optimizer: AdamW (lr=0.0005, weight_decay=0.01)
-  - Scheduler: Cosine Annealing with 3-epoch warmup
-  - Loss Function: Cross-Entropy with 0.1 label smoothing
-  - Batch Size: 128
-  - Max Sequence Length: 50
+---
 
+# 🤖 Model Architecture
 
-## 📶 Visualizations
+### **1. Transformer Configuration**
+- Embedding Dimension: **256**  
+- Hidden Size: **512**  
+- Attention Heads: **8**  
+- Encoder Layers: **4**  
+- Dropout: **0.3**  
+- Parameters: **7,044,365**
 
-[![Visuals](output/visualizations/audio_features.png)]()
+### **2. Training Hyperparameters**
+- Optimizer: **AdamW (lr=5e-4, weight_decay=0.01)**  
+- Scheduler: **Cosine Annealing** + 3 epoch warmup  
+- Loss: **Cross-Entropy + Label Smoothing (0.1)**  
+- Batch Size: **128**  
+- Max Sequence Length: **50**
 
-[![Visuals](output/visualizations/data_distribution.png)]()
-[![Visuals](output/visualizations/dataset_statistics.png)]()
-[![Visuals](output/visualizations/feature_importance.png)]()
-[![Visuals](output/visualizations/training_efficiency.png)]()
-[![Visuals](output/visualizations/transformer_test_results.png)]()
+---
 
+# 📶 Visualizations
 
-## 📘 Usage Examples
+![Audio Features](output/visualizations/audio_features.png)  
+![Distribution](output/visualizations/data_distribution.png)  
+![Statistics](output/visualizations/dataset_statistics.png)  
+![Importance](output/visualizations/feature_importance.png)  
+![Training Efficiency](output/visualizations/training_efficiency.png)  
+![Transformer Results](output/visualizations/transformer_test_results.png)
 
-**Training Model**
-```
+---
+
+# 📘 Usage Examples
+
+### **Training Model**
+1. Baseline Modesl
+```python
 from TraningConfig import TrainingConfig
 from PlaylistTransformer import PlaylistTransformer
 from Trainer import Trainer
 
-# Initialize config
 config = TrainingConfig()
 
-# Create model
 model = PlaylistTransformer(
-    num_items=50000 + 2,  # vocab + PAD + UNK
+    num_items=50000 + 2,
     d_model=256,
     nhead=8,
     num_layer=4,
     dropout=0.3
 )
 
-# Train
 trainer = Trainer(model, train_loader, val_loader, config, "Transformer")
 results = trainer.train()
-```
 
-**Generating Recommendation**
-```
 from BaselineModels import BaselineModels
 
-# Load trained KNN model
 baselines = BaselineModels(config)
 baselines.train_knn(embeddings)
 
-# Get recommendations
-seed_song = "spotify:track:6rqhFgbbKwnb9MLmUQDhG6"  # Shape of You
+seed_song = "spotify:track:6rqhFgbbKwnb9MLmUQDhG6"
 recommendations = baselines.get_knn_recommendations(seed_song, k=10)
 
-# Display results
 for track_uri, similarity in recommendations:
     print(f"{track_uri}: {similarity:.3f}")
-```
 
-**Context-Aware Recommendation**
-```
+
+2. Context-Aware Recommendation
 from ContextAwareTransformer import ContextAwareTransformer
 
-# Create context-aware model
 model = ContextAwareTransformer(
     num_items=50000 + 2,
-    num_contexts=8,  # workout, study, party, chill, sleep, sad, happy, other
+    num_contexts=8,
     d_model=256
 )
 
-# Generate playlist with context
 seed_songs = [song1, song2, song3]
 context = 0  # workout
+
 playlist = model.generate_playlist(
-    seed_songs, 
+    seed_songs,
     context_idx=context,
     max_length=15,
     temperature=1.0,
     top_k=50
 )
-```
