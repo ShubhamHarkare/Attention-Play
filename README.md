@@ -152,6 +152,40 @@ The Transformer achieves *state-of-the-art performance* across all Top-K metrics
 ---
 
 # 📘 Usage Examples
+## 🚀 Quick Start
+
+### Setup
+```bash
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### Download Data
+1. Download [Spotify Million Playlist Dataset](https://www.aicrowd.com/challenges/spotify-million-playlist-dataset-challenge)
+2. Extract JSON files to `archive-2/data/`
+
+### Run
+```bash
+# 1. Process data & train baselines
+python main.py
+
+# 2. Train deep learning models  
+python main_2.py
+
+# 3. Generate visualizations
+python create_visuals.py
+```
+
+### Configuration
+- **Quick test (20 min)**: Set `NUM_FILES_TO_PROCESS = 10` in `config.py`
+- **Full dataset (3+ hours)**: Set `NUM_FILES_TO_PROCESS = 100`
+
+### Results
+All outputs saved to `output/`:
+- `models/` - Trained models
+- `visualizations/` - Plots for poster
+- `metrics/` - Performance results (JSON)
 
 ### **Training Model**
 1. Baseline Modesl
