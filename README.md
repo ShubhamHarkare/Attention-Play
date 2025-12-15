@@ -77,12 +77,20 @@ The Transformer achieves *state-of-the-art performance* across all Top-K metrics
   <td>44.73%</td>
 </tr>
 <tr>
-  <td><b>Transformer</b></td>
-  <td><b>10.95%</b></td>
-  <td><b>25.24%</b></td>
-  <td><b>34.40%</b></td>
-  <td><b>45.55%</b></td>
+  <td>Transformer</td>
+  <td>10.95%</td>
+  <td>25.24%</td>
+  <td>34.40%</td>
+  <td>45.55%</td>
 </tr>
+<tr>
+  <td><b>Context-Aware Transformer</b></td>
+  <td><b>11.50%</b></td>
+  <td><b>25.90%</b></td>
+  <td><b>34.88%</b></td>
+  <td><b>45.96%</b></td>
+</tr>
+
 </table>
 
 ### 🗝️ Key Findings
@@ -175,9 +183,10 @@ recommendations = baselines.get_knn_recommendations(seed_song, k=10)
 
 for track_uri, similarity in recommendations:
     print(f"{track_uri}: {similarity:.3f}")
-
+```
 
 2. Context-Aware Recommendation
+```python
 from ContextAwareTransformer import ContextAwareTransformer
 
 model = ContextAwareTransformer(
@@ -196,3 +205,4 @@ playlist = model.generate_playlist(
     temperature=1.0,
     top_k=50
 )
+```
